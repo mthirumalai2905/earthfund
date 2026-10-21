@@ -15,8 +15,8 @@ const easeOut = (v: number, a: number, b: number) => 1 - Math.pow(1 - range(v, a
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 const SUN_OPENING = new THREE.Vector3(1, 0.22, -0.5).normalize();
-const SUN_MISSION = new THREE.Vector3(0.75, 0.3, 0.6).normalize();
-const SUN_ENTRY = new THREE.Vector3(0.45, 0.75, -0.35).normalize();
+const SUN_MISSION = new THREE.Vector3(-0.3, 0.42, 0.85).normalize();
+const SUN_ENTRY = new THREE.Vector3(0.8, 0.5, 0.35).normalize();
 const SUN_CLOSING = new THREE.Vector3(0.85, 0.25, 0.55).normalize();
 
 interface WindowEl {
@@ -120,8 +120,7 @@ export function createDirector(root: HTMLElement, { scene, motes, caps }: Option
   const layers = qa("[data-layer]");
   const scrim = q("[data-el=scrim]");
   const motesEl = q("[data-el=motes]");
-  const rings = qa<SVGCircleElement>("[data-ring]");
-  const ringNodes = qa<SVGGElement>("[data-ring-node]");
+  const solar = q("[data-el=solar]");
   const processFill = q("[data-process-fill]");
   const processSteps = qa("[data-process-step]");
   const focusTrack = q("[data-el=focus-track]");
@@ -196,9 +195,9 @@ export function createDirector(root: HTMLElement, { scene, motes, caps }: Option
     let canvasOpacity: number;
     if (!closing) {
       const eo = ease(o, 0, 1), em = ease(m, 0, 0.9);
-      state.camDist = lerp(lerp(lerp(3.45, 3.05, eo), 2.4, em), 1.17, easeOut(at, 0.02, 1));
-      state.earthY = lerp(lerp(lerp(-1.32, -1.15, intro), -0.78, eo), 0, em);
-      state.earthX = lerp(lerp(0, 0.6 * side, em), 0, ease(at, 0, 0.45));
+      state.camDist = lerp(lerp(lerp(3.45, 3.05, eo), 2.55, em), 1.17, easeOut(at, 0.02, 1));
+      state.earthY = lerp(lerp(lerp(-1.32, -1.15, intro), -0.78, eo), -0.05, em);
+      state.earthX = lerp(lerp(0, 0.95 * side, em), 0, ease(at, 0, 0.45));
       state.lookY = lerp(0, 1.2, ease(at, 0.12, 1));
       state.sun.copy(SUN_OPENING).lerp(SUN_MISSION, em).lerp(SUN_ENTRY, ease(at, 0.15, 1));
       state.spin = -1.75 + timeSpin + o * 0.15 + m * 0.6 + at * 0.45;
@@ -219,7 +218,8 @@ export function createDirector(root: HTMLElement, { scene, motes, caps }: Option
       state.starSpin = 0.4 + ct * 0.12 + pointer.sx * 0.01 * motion;
       canvasOpacity = ease(ct, 0, 0.22);
     }
-    state.exposure = intro;
+    // Dim as we drop toward the surface so the mirror ocean never blows out behind the copy.
+    state.exposure = intro * (closing ? 1 : 1 - ease(at, 0.08, 0.6) * 0.5);
 
     if (canvasWrap) canvasWrap.style.opacity = canvasOpacity.toFixed(3);
     if (scene && canvasOpacity > 0.003) scene.render(state, time);
@@ -242,11 +242,7 @@ export function createDirector(root: HTMLElement, { scene, motes, caps }: Option
       const exit = i < n - 1 ? ease(local, 0.74, 1) : 0;
       const opacity = 1 - exit;
       let scale = 1.05 + 0.12 * clamp01(local) * motion + exit * 0.32 * motion;
-      let bright = 1;
-      if (i === 0) {
-        scale += (1 - entry) * 0.35 * motion;
-        bright = 1 + (1 - entry) * 0.9;
-      }
+      if (i === 0) scale += (1 - entry) * 0.35 * motion;
       if (i === n - 1) scale += deep * 0.14 * motion;
       const ready = i === 0 ? at > 0.84 : local > -0.3;
       const visible = ready && opacity > 0.002 && canvasOpacity < 0.999;
@@ -256,9 +252,8 @@ export function createDirector(root: HTMLElement, { scene, motes, caps }: Option
       const px = -pointer.sx * 14 * motion;
       const py = -pointer.sy * 9 * motion;
       el.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`;
-      el.style.filter = bright > 1.001 ? `brightness(${bright.toFixed(3)})` : "none";
     }
-    if (scrim) scrim.style.opacity = (ease(imp, 0, 0.32) * 0.86).toFixed(3);
+    if (scrim) scrim.style.opacity = (ease(imp, 0, 0.22) * 0.96).toFixed(3);
 
     // ---- Overlay copy windows --------------------------------------------------------
     for (const w of windows) {
@@ -273,17 +268,16 @@ export function createDirector(root: HTMLElement, { scene, motes, caps }: Option
       w.el.style.pointerEvents = op > 0.5 ? "auto" : "none";
     }
 
-    // ---- Impact visualisation ---------------------------------------------------------
-    rings.forEach((r, i) => {
-      const t = ease(imp, 0.1 + i * 0.05, 0.4 + i * 0.05);
-      r.style.strokeDashoffset = (1 - t).toFixed(4);
-    });
-    ringNodes.forEach((g, i) => {
-      const t = ease(imp, 0.1 + i * 0.05, 0.4 + i * 0.05);
-      const deg = -90 + t * 360 * (0.55 + i * 0.08) + (motion ? time * (2 + i) : 0);
-      g.setAttribute("transform", `rotate(${deg.toFixed(2)} 300 300)`);
-      g.style.opacity = t > 0.01 ? "1" : "0";
-    });
+    // ---- Solar system: settles in with scroll, then floats with the pointer ---------------
+    if (solar) {
+      const t = ease(imp, 0.08, 0.38);
+      const drift = motion ? Math.sin(time * 0.35) * 4 : 0;
+      const sx = pointer.sx * 10 * motion;
+      const sy = pointer.sy * 6 * motion + drift;
+      const s = 0.9 + t * 0.1;
+      solar.style.opacity = t.toFixed(3);
+      solar.style.transform = `translate3d(${sx.toFixed(1)}px, ${((1 - t) * 40 + sy).toFixed(1)}px, 0) scale(${s.toFixed(4)})`;
+    }
 
     // ---- Approach timeline ------------------------------------------------------------
     if (processFill) {

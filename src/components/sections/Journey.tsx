@@ -15,7 +15,10 @@ export default function Journey() {
               {opening.eyebrow}
             </p>
             <h1 id="opening-title" className="hero-title hero-in" style={{ animationDelay: "0.9s" }}>
-              {opening.title}
+              <span className="chrome-edge" aria-hidden="true">
+                {opening.title}
+              </span>
+              <span className="chrome-text">{opening.title}</span>
             </h1>
             <p className="hero-tagline hero-in" style={{ animationDelay: "1.4s" }}>
               {opening.tagline}

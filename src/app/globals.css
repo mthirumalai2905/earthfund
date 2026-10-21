@@ -133,7 +133,6 @@ ul {
   padding-bottom: 0.06em;
 }
 
-.hero-title,
 .display-xl,
 .contact-copy .display-xl {
   background: var(--chrome);
@@ -144,6 +143,56 @@ ul {
   filter: drop-shadow(0 2px 24px rgba(0, 0, 0, 0.55));
 }
 
+/* Liquid chrome headline: the letters are cut from a rendered chrome texture that slowly flows. */
+.hero-title {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+.hero-title .chrome-text,
+.hero-title .chrome-edge {
+  display: block;
+}
+.hero-title .chrome-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  color: #07080b;
+  transform: translate3d(0, 0.028em, 0);
+  text-shadow: 0 -0.012em 0 rgba(255, 255, 255, 0.55), 0 0.06em 0.12em rgba(0, 0, 0, 0.85);
+}
+@property --sweep-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 170%;
+}
+@property --flow-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+.hero-title .chrome-text {
+  position: relative;
+  z-index: 2;
+  color: transparent;
+  background:
+    linear-gradient(108deg, rgba(255, 255, 255, 0) 42%, rgba(255, 255, 255, 0.85) 49%, rgba(255, 255, 255, 0.15) 52%, rgba(255, 255, 255, 0) 58%),
+    url("/images/chrome-texture.jpg");
+  background-size: 300% 100%, 165% auto;
+  background-position: var(--sweep-x) 0, var(--flow-x) 50%;
+  background-repeat: no-repeat, repeat-x;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: chromeFlow 26s ease-in-out infinite alternate, chromeSweep 7s cubic-bezier(0.65, 0, 0.3, 1) 2.2s infinite;
+}
+@keyframes chromeFlow {
+  from { --flow-x: 0%; }
+  to { --flow-x: 100%; }
+}
+@keyframes chromeSweep {
+  0% { --sweep-x: 170%; }
+  50%, 100% { --sweep-x: -170%; }
+}
 .display-xl {
   font-size: clamp(2.8rem, 6.2vw, 6.4rem);
   line-height: 0.98;
@@ -196,6 +245,9 @@ ul {
   inset: 0;
 }
 
+.nature {
+  isolation: isolate;
+}
 .nature-layer {
   visibility: hidden;
   will-change: transform, opacity;
@@ -208,8 +260,8 @@ ul {
 .scrim {
   opacity: 0;
   background:
-    radial-gradient(120% 90% at 70% 40%, rgba(8, 9, 12, 0.55), rgba(1, 1, 2, 0.96) 70%),
-    linear-gradient(180deg, rgba(1, 1, 2, 0.6), rgba(1, 1, 2, 0.95));
+    radial-gradient(120% 90% at 70% 40%, rgba(6, 7, 10, 0.86), rgba(1, 1, 2, 0.99) 70%),
+    linear-gradient(180deg, rgba(1, 1, 2, 0.8), rgba(1, 1, 2, 0.98));
 }
 
 .scene {
@@ -571,57 +623,58 @@ html.js [data-window]:not([data-window^="-"]) {
   gap: clamp(2rem, 6vw, 7rem);
   align-items: start;
 }
+.impact-visual {
+  align-self: stretch;
+}
 .impact-visual-sticky {
   position: sticky;
-  top: 14vh;
+  top: 12vh;
 }
-.rings {
+.solar {
+  margin: 0;
   width: 100%;
-  max-width: 580px;
+  max-width: 620px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.solar img {
+  display: block;
+  width: 100%;
   height: auto;
-  overflow: visible;
+  -webkit-mask-image: radial-gradient(ellipse 72% 66% at 50% 50%, #000 66%, transparent 100%);
+  mask-image: radial-gradient(ellipse 72% 66% at 50% 50%, #000 66%, transparent 100%);
+}.solar-caption {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  margin: 1.2rem 0 0;
+  max-width: 620px;
+  text-align: center;
 }
-.ring-base {
-  fill: none;
-  stroke: var(--hair);
-  stroke-width: 1;
-}
-.ring-progress {
-  fill: none;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-}
-.ring-node {
-  stroke: none;
-}
-.ring-halo {
-  fill: none;
-  stroke-width: 1;
-  opacity: 0.4;
-}
-.ring-0 .ring-progress, .ring-0 .ring-halo { stroke: var(--c-climate); }
-.ring-1 .ring-progress, .ring-1 .ring-halo { stroke: var(--c-land); }
-.ring-2 .ring-progress, .ring-2 .ring-halo { stroke: var(--c-ocean); }
-.ring-3 .ring-progress, .ring-3 .ring-halo { stroke: var(--c-water); }
-.ring-4 .ring-progress, .ring-4 .ring-halo { stroke: var(--c-bio); }
-.ring-0 .ring-node, .metric-dot.ring-0 { fill: var(--c-climate); background: var(--c-climate); }
-.ring-1 .ring-node, .metric-dot.ring-1 { fill: var(--c-land); background: var(--c-land); }
-.ring-2 .ring-node, .metric-dot.ring-2 { fill: var(--c-ocean); background: var(--c-ocean); }
-.ring-3 .ring-node, .metric-dot.ring-3 { fill: var(--c-water); background: var(--c-water); }
-.ring-4 .ring-node, .metric-dot.ring-4 { fill: var(--c-bio); background: var(--c-bio); }
-.rings-kicker {
-  fill: var(--gold);
-  font-family: var(--sans);
-  font-size: 12px;
-  letter-spacing: 0.3em;
+.solar-kicker {
+  color: var(--gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
 }
-.rings-title {
-  fill: var(--text);
+.solar-title {
   font-family: var(--serif);
-  font-size: 34px;
+  font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+  line-height: 1.1;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
-
+.solar-note {
+  font-size: 0.72rem;
+  color: var(--faint);
+}
+.metric-dot.ring-0 { background: var(--c-climate); }
+.metric-dot.ring-1 { background: var(--c-land); }
+.metric-dot.ring-2 { background: var(--c-ocean); }
+.metric-dot.ring-3 { background: var(--c-water); }
+.metric-dot.ring-4 { background: var(--c-bio); }
 .metrics {
   margin-top: 3.2rem;
 }
@@ -966,10 +1019,11 @@ html.js [data-window]:not([data-window^="-"]) {
     position: relative;
     top: 0;
   }
-  .rings {
-    max-width: 420px;
-    margin: 0 auto;
-    display: block;
+  .solar,
+  .solar-caption {
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .metric {
     grid-template-columns: 0.6rem 1fr;
@@ -1025,6 +1079,7 @@ html.js [data-window]:not([data-window^="-"]) {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-in,
+  .hero-title .chrome-text,
   .scroll-cue i::after {
     animation: none;
   }

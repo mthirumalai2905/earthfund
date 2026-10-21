@@ -49,7 +49,7 @@ export const mission = {
 };
 
 export const atmosphere = {
-  line: "Everything we value lives beneath a thin blue line",
+  line: "Everything we value lives beneath a thin silver line",
 };
 
 export type Ecosystem = {
@@ -65,7 +65,7 @@ export const ecosystems: Ecosystem[] = [
   {
     key: "climate",
     image: "/images/silver-01-cloud-sea.jpg",
-    alt: "Smooth liquid chrome clouds drifting in darkness",
+    alt: "An endless sea of liquid chrome clouds under a black sky",
     theme: "Climate",
     title: "The sky is a shared balance sheet",
     body: "We back technologies and projects that cut emissions at the source and remove what is already in the air.",
@@ -73,7 +73,7 @@ export const ecosystems: Ecosystem[] = [
   {
     key: "freshwater",
     image: "/images/silver-02-mountains.jpg",
-    alt: "A chrome mountain with an iridescent river winding down its slope",
+    alt: "A chrome mountain range reflected in a mercury lake",
     theme: "Freshwater",
     title: "Water begins in high places",
     body: "Snowpacks and watersheds feed the rivers that cities, farms and industry rely on. We invest in protecting the sources.",
@@ -81,7 +81,7 @@ export const ecosystems: Ecosystem[] = [
   {
     key: "forests",
     image: "/images/silver-03-forest.jpg",
-    alt: "A grove of sculpted chrome trees reflected on a black floor",
+    alt: "Light shafts falling through an old forest of chrome trees",
     theme: "Forests and land",
     title: "The oldest infrastructure on Earth",
     body: "Forests regulate rainfall, store carbon and shelter an extraordinary share of life on land. We fund models that make standing forests worth more than cleared ones.",
@@ -89,7 +89,7 @@ export const ecosystems: Ecosystem[] = [
   {
     key: "coasts",
     image: "/images/silver-04-ocean.jpg",
-    alt: "A single liquid chrome wave curling in darkness",
+    alt: "Mercury waves rolling toward a low sun",
     theme: "Coasts",
     title: "Where land meets sea",
     body: "Reefs, mangroves and wetlands defend coastlines and nurture fisheries. We look for models that reward the people who keep them healthy.",
@@ -97,7 +97,7 @@ export const ecosystems: Ecosystem[] = [
   {
     key: "oceans",
     image: "/images/silver-05-underwater.jpg",
-    alt: "A beam of light on chrome kelp ribbons and a silver fish",
+    alt: "A chrome sea turtle gliding over a silver coral reef",
     theme: "Oceans",
     title: "The blue engine",
     body: "The ocean absorbs heat and carbon on a planetary scale. We invest in restoration, responsible aquaculture and the data that makes ocean health measurable.",
@@ -157,7 +157,7 @@ export const focus = {
     {
       key: "land",
       image: "/images/silver-focus-land.jpg",
-      alt: "A chrome sapling growing from a polished mound",
+      alt: "Rolling chrome farmland with trees and a mercury pond",
       title: "Regenerative land",
       body: "Agriculture and land management that rebuild soil, water retention and biodiversity while staying productive.",
       tags: ["Soil health", "Agroforestry", "Supply chains"],
@@ -165,7 +165,7 @@ export const focus = {
     {
       key: "coastal",
       image: "/images/silver-focus-ocean.jpg",
-      alt: "A chrome sea turtle gliding through darkness",
+      alt: "Chrome mangrove roots standing in still silver water",
       title: "Coasts and blue carbon",
       body: "Mangroves, seagrass and wetlands that protect shorelines, support fisheries and store carbon.",
       tags: ["Mangroves", "Fisheries", "Coastal resilience"],
@@ -173,7 +173,7 @@ export const focus = {
     {
       key: "energy",
       image: "/images/silver-focus-energy.jpg",
-      alt: "A single chrome wind turbine",
+      alt: "Chrome wind turbines standing in a mercury sea",
       title: "Clean energy transition",
       body: "Generation, storage and efficiency where the environmental footprint is designed in, not offset later.",
       tags: ["Renewables", "Storage", "Grid efficiency"],
@@ -181,7 +181,7 @@ export const focus = {
     {
       key: "water",
       image: "/images/silver-focus-water.jpg",
-      alt: "A chrome droplet landing on a still silver surface",
+      alt: "A mercury river running between chrome boulders toward silver mountains",
       title: "Freshwater systems",
       body: "Watershed protection, water efficiency and the monitoring that lets rivers be managed as the assets they are.",
       tags: ["Watersheds", "Efficiency", "Monitoring"],

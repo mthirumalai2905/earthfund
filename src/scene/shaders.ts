@@ -71,12 +71,21 @@ vec3 irid(float t){
 /** Fake studio environment: a soft key light, a strip light and a faint floor gradient. */
 const studio = /* glsl */ `
 vec3 studioEnv(vec3 r, vec3 L){
+  // Key softbox around the sun direction, soft and large with a hot core.
   float d = max(dot(r, L), 0.0);
-  float key = pow(d, 24.0)*7.0 + pow(d, 4.0)*0.45;
+  float key = pow(d, 30.0)*6.0 + pow(d, 6.0)*0.9 + pow(d, 2.0)*0.12;
+  // Long strip light crossing the key: the signature chrome reflection line.
   vec3 axis = normalize(cross(L, vec3(0.0, 1.0, 0.35)));
-  float strip = smoothstep(0.09, 0.0, abs(dot(r, axis))) * smoothstep(-0.3, 0.5, dot(r, L)) * 0.8;
-  float fill = 0.012 + 0.04*smoothstep(-1.0, 1.0, r.y);
-  return vec3(key + strip + fill);
+  float strip = smoothstep(0.07, 0.0, abs(dot(r, axis))) * smoothstep(-0.4, 0.4, dot(r, L)) * 1.1;
+  // Back rim light opposite the key, slightly above.
+  vec3 K = normalize(vec3(-L.x, 0.45, -L.z));
+  float dk = max(dot(r, K), 0.0);
+  float rim = pow(dk, 14.0) * 1.6 + pow(dk, 3.0) * 0.1;
+  // Overhead panel and faint floor bounce so the dark side still reads as metal.
+  float top = pow(max(r.y, 0.0), 5.0) * 0.35;
+  float floor = pow(max(-r.y, 0.0), 3.0) * 0.06;
+  float fill = 0.018;
+  return vec3(key + strip + rim + top + floor + fill) * vec3(0.98, 0.99, 1.02);
 }
 `;
 
@@ -132,12 +141,19 @@ void main(){
   float land = smoothstep(0.26, 0.46, d.g);
   float ice = smoothstep(0.5, 0.78, lum);
 
-  vec2 o = uTexel * 1.5;
+  // Two-scale relief: broad ranges from a wide tap, fine ridges and coast detail from a tight one.
+  vec2 o = uTexel * 1.25;
+  vec2 ow = uTexel * 5.0;
   float hx = texture2D(uData, vUv + vec2(o.x, 0.0)).r - texture2D(uData, vUv - vec2(o.x, 0.0)).r;
   float hy = texture2D(uData, vUv + vec2(0.0, o.y)).r - texture2D(uData, vUv - vec2(0.0, o.y)).r;
+  float wx = texture2D(uData, vUv + vec2(ow.x, 0.0)).r - texture2D(uData, vUv - vec2(ow.x, 0.0)).r;
+  float wy = texture2D(uData, vUv + vec2(0.0, ow.y)).r - texture2D(uData, vUv - vec2(0.0, ow.y)).r;
   float bx = luma(texture2D(uAlbedo, vUv + vec2(o.x, 0.0)).rgb) - luma(texture2D(uAlbedo, vUv - vec2(o.x, 0.0)).rgb);
   float by = luma(texture2D(uAlbedo, vUv + vec2(0.0, o.y)).rgb) - luma(texture2D(uAlbedo, vUv - vec2(0.0, o.y)).rgb);
-  vec2 grad = vec2(hx, hy) * land + vec2(bx, by) * mix(0.35, 0.12, land);
+  vec2 grad = (vec2(hx, hy) * 1.2 + vec2(wx, wy) * 0.35) * land + vec2(bx, by) * mix(0.3, 0.14, land);
+  // Coastlines stand up as a bevelled edge, like engraved chrome.
+  float coast = land * (1.0 - land) * 4.0;
+  grad += vec2(dFdx(land), dFdy(land)) * coast * 0.6;
 
   vec3 Ng = normalize(vNormalW);
   vec3 T = normalize(vTangentW - Ng * dot(vTangentW, Ng));
@@ -157,29 +173,41 @@ void main(){
   vec2 sunT = vec2(dot(L, T), dot(L, B)) * 0.0025;
   float shadow = 1.0 - smoothstep(0.2, 0.9, texture2D(uData, vUv - vec2(uCloudShift, 0.0) + sunT).b) * 0.5;
 
-  // Land: satin silver whose tone follows the real surface (bright deserts, darker forests).
-  float tone = mix(0.32, 1.08, pow(clamp((lum - 0.04) * 2.2, 0.0, 1.0), 0.75));
-  vec3 silver = mix(vec3(0.62, 0.64, 0.68) * tone, vec3(0.95, 0.96, 0.98), ice);
-  float spec = pow(max(dot(N, H), 0.0), 36.0);
   vec3 env = studioEnv(R, L);
-  vec3 metal = silver * diff * 1.15 * shadow + silver * spec * 0.7 * shadow + env * 0.09 * lit + silver * 0.012;
+  // Rough land blurs the reflection: sample the environment around a normal pulled toward the sphere.
+  vec3 envSoft = studioEnv(normalize(mix(R, reflect(-V, Ng), 0.5)), L);
+  float dayFill = 0.35 + 0.65 * lit;
 
-  // Oceans: polished mercury, dark until they catch the light, shelves read through bathymetry.
+  // Land: satin silver whose tone follows the real surface (bright deserts, darker forests).
+  float tone = mix(0.5, 1.12, pow(clamp((lum - 0.04) * 2.2, 0.0, 1.0), 0.75));
+  vec3 silver = mix(vec3(0.64, 0.66, 0.7) * tone, vec3(0.95, 0.96, 0.98), ice);
+  float spec = pow(max(dot(N, H), 0.0), 42.0);
+  float spec2 = pow(max(dot(N, H), 0.0), 8.0) * 0.18;
+  vec3 metal = silver * (diff * 1.05 + spec2) * shadow
+    + silver * spec * 0.9 * shadow
+    + envSoft * silver * 0.85 * dayFill
+    + silver * 0.015;
+
+  // Oceans: polished mercury that mirrors the studio, shelves read through bathymetry.
   float shelf = smoothstep(0.07, 0.24, lum);
-  float glint = pow(max(dot(R, L), 0.0), 420.0) * 9.0;
-  vec3 ocean = env * (0.22 + 0.78 * fres) * lit * shadow
-    + vec3(0.032, 0.034, 0.04) * diff * (0.5 + shelf * 2.2)
+  float glint = pow(max(dot(R, L), 0.0), 520.0) * 10.0;
+  vec3 ocean = env * (0.65 + 0.6 * fres) * dayFill * shadow
+    + vec3(0.04, 0.042, 0.048) * diff * (0.5 + shelf * 2.4)
     + vec3(glint) * lit * shadow;
-  ocean = mix(ocean, silver * diff * shadow + env * 0.1 * lit, ice * 0.85);
+  ocean = mix(ocean, silver * diff * shadow + envSoft * 0.25 * dayFill, ice * 0.85);
 
   vec3 col = mix(ocean, metal, land);
 
-  float limb = pow(1.0 - ndvG, 2.4);
-  col = mix(col, vec3(0.72, 0.75, 0.82) * (0.3 + diff), limb * 0.5 * lit);
-  float film = pow(1.0 - ndvG, 3.6);
-  col += irid(ndvG * 1.3 + lum * 0.6) * film * (0.08 + 0.92 * lit) * 0.75;
+  // Terminator: a warm-silver band where the key light grazes the surface.
+  float graze = smoothstep(-0.1, 0.05, ndlG) * (1.0 - smoothstep(0.05, 0.35, ndlG));
+  col += vec3(0.9, 0.82, 0.72) * graze * 0.08 * (0.4 + 0.6 * land);
 
-  gl_FragColor = vec4(toDisplay(col * uExposure), 1.0);
+  float limb = pow(1.0 - ndvG, 2.4);
+  col = mix(col, vec3(0.74, 0.77, 0.84) * (0.3 + diff), limb * 0.45 * lit);
+  float film = pow(1.0 - ndvG, 3.6);
+  col += irid(ndvG * 1.3 + lum * 0.6) * film * (0.1 + 0.9 * lit) * 0.7;
+
+  gl_FragColor = vec4(toDisplay(col * uExposure * 1.25), 1.0);
 }
 `;
 
@@ -207,9 +235,11 @@ void main(){
   float self = 1.0 - max(toward - c, 0.0) * 0.8 + max(c - toward, 0.0) * 0.5;
   float ndl = dot(N, L);
   float fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
-  vec3 col = vec3(0.84, 0.86, 0.9) * (max(ndl, 0.0) * 1.3 * self + 0.01);
+  vec3 H = normalize(L + V);
+  float sheen = pow(max(dot(N, H), 0.0), 20.0) * 0.6;
+  vec3 col = vec3(0.9, 0.92, 0.95) * (max(ndl, 0.0) * 1.35 * self + sheen + 0.01);
   col += irid(c * 1.2 + fres) * fres * 0.28 * smoothstep(-0.2, 0.3, ndl);
-  float a = c * (smoothstep(-0.25, 0.12, ndl) * 0.68 + 0.04);
+  float a = c * c * (smoothstep(-0.25, 0.12, ndl) * 0.55 + 0.03);
   gl_FragColor = vec4(toDisplay(col * uExposure), a * clamp(uExposure, 0.0, 1.0));
 }
 `;
