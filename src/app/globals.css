@@ -358,7 +358,7 @@ ul {
 
 .site-nav {
   display: flex;
-  gap: 2.2rem;
+  gap: 1.6rem;
   margin-left: auto;
   font-size: 0.82rem;
   color: var(--muted);
@@ -748,6 +748,55 @@ html.js [data-window]:not([data-window^="-"]) {
   color: var(--muted);
 }
 
+.mandate {
+  max-width: 46rem;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--hair);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.holdings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 3rem);
+  margin-top: clamp(3.5rem, 9vh, 6rem);
+}
+.holding {
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--hair);
+}
+.holding-mark {
+  display: flex;
+  align-items: center;
+  height: 4.6rem;
+  margin-bottom: 1.3rem;
+  color: var(--text);
+}
+.holding-mark svg {
+  height: 3.1rem;
+  width: auto;
+}
+.mark-realtime-web img {
+  height: 4.6rem;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
+.holding h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 3.2vw, 3.2rem);
+  line-height: 1.05;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .process {
   margin-top: clamp(5rem, 14vh, 9rem);
 }
@@ -1033,7 +1082,8 @@ html.js [data-window]:not([data-window^="-"]) {
     grid-column: 2;
   }
 
-  .principles {
+  .principles,
+  .holdings {
     grid-template-columns: 1fr;
   }
   .process-line {

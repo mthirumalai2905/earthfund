@@ -1,14 +1,13 @@
 /**
- * All copy on the site lives here. Every line is DRAFT copy written for review:
- * replace it with approved wording before launch. No figures, holdings, partners
- * or team members are stated anywhere; add them here once they are confirmed.
+ * All copy on the site lives here. Wording is still draft pending Paal's review.
+ * Portfolio names and the investment mandate below follow the 23 Oct 2026 workshop.
  */
 
 export const site = {
   name: "Earth Fund",
   contactEmail: "paal@synx.tools",
   draftNotice:
-    "Preview build. All copy is draft and subject to approval. Fund details, team and portfolio will be added once confirmed.",
+    "Preview build. Copy is draft and subject to approval. Team details will be added once confirmed.",
   legal:
     "This website is for information only and does not constitute an offer to sell, or a solicitation of an offer to buy, any security or fund interest.",
 };
@@ -20,6 +19,7 @@ export type ChapterId =
   | "ecosystems"
   | "impact"
   | "approach"
+  | "portfolio"
   | "focus"
   | "contact";
 
@@ -31,6 +31,7 @@ export const chapters: { id: ChapterId; label: string; nav?: boolean }[] = [
   { id: "ecosystems", label: "Ecosystems" },
   { id: "impact", label: "Impact", nav: true },
   { id: "approach", label: "Approach", nav: true },
+  { id: "portfolio", label: "Portfolio", nav: true },
   { id: "focus", label: "Focus", nav: true },
   { id: "contact", label: "Contact", nav: true },
 ];
@@ -84,7 +85,7 @@ export const ecosystems: Ecosystem[] = [
     alt: "Light shafts falling through an old forest of chrome trees",
     theme: "Forests and land",
     title: "The oldest infrastructure on Earth",
-    body: "Forests regulate rainfall, store carbon and shelter an extraordinary share of life on land. We fund models that make standing forests worth more than cleared ones.",
+    body: "Forests regulate rainfall and shelter an extraordinary share of life on land. We fund models that make standing forests worth more than cleared ones.",
   },
   {
     key: "coasts",
@@ -100,7 +101,7 @@ export const ecosystems: Ecosystem[] = [
     alt: "A chrome sea turtle gliding over a silver coral reef",
     theme: "Oceans",
     title: "The blue engine",
-    body: "The ocean absorbs heat and carbon on a planetary scale. We invest in restoration, responsible aquaculture and the data that makes ocean health measurable.",
+    body: "The ocean absorbs heat on a planetary scale. We invest in restoration, responsible aquaculture and the data that makes ocean health measurable.",
   },
 ];
 
@@ -147,36 +148,49 @@ export const approach = {
     { step: "Measure", body: "Track results with independent data and on-the-ground verification." },
     { step: "Report", body: "Publish what worked, what did not, and what we changed." },
   ],
+  mandate:
+    "We do not invest in weapons, war, coal, fossil fuels, carbon-based fuels, or wind turbines. We back solar, hemp, and natural biodegradable materials that replace plastic and support human survival.",
+};
+
+export const portfolio = {
+  eyebrow: "Portfolio",
+  title: "A short list, on purpose",
+  body: "Investors commit capital to Earth Fund and join the investment team. The fund is being established in Dubai. These are the companies already in the portfolio.",
+  companies: [
+    { name: "Apollo", mark: "apollo" },
+    { name: "MarNet", mark: "marnet" },
+    { name: "Realtime Web", mark: "realtime-web" },
+  ] as const,
 };
 
 export const focus = {
   eyebrow: "Where we look",
   title: "Areas of focus",
-  body: "The sectors we are building our pipeline around. These are areas of interest, not portfolio holdings.",
+  body: "Where new capital is aimed. Current holdings are listed in the portfolio.",
   areas: [
     {
-      key: "land",
+      key: "materials",
       image: "/images/silver-focus-land.jpg",
-      alt: "Rolling chrome farmland with trees and a mercury pond",
-      title: "Regenerative land",
-      body: "Agriculture and land management that rebuild soil, water retention and biodiversity while staying productive.",
-      tags: ["Soil health", "Agroforestry", "Supply chains"],
+      alt: "Chrome hills, silver trees and a mercury pond",
+      title: "Hemp and natural materials",
+      body: "Hemp production and organic, biodegradable compounds meant to replace plastics, on land that stays productive.",
+      tags: ["Hemp", "Plastic replacement", "Organic compounds"],
     },
     {
       key: "coastal",
       image: "/images/silver-focus-ocean.jpg",
       alt: "Chrome mangrove roots standing in still silver water",
-      title: "Coasts and blue carbon",
-      body: "Mangroves, seagrass and wetlands that protect shorelines, support fisheries and store carbon.",
+      title: "Living coasts",
+      body: "Mangroves, seagrass and wetlands that protect shorelines and support fisheries.",
       tags: ["Mangroves", "Fisheries", "Coastal resilience"],
     },
     {
-      key: "energy",
-      image: "/images/silver-focus-energy.jpg",
-      alt: "Chrome wind turbines standing in a mercury sea",
-      title: "Clean energy transition",
-      body: "Generation, storage and efficiency where the environmental footprint is designed in, not offset later.",
-      tags: ["Renewables", "Storage", "Grid efficiency"],
+      key: "solar",
+      image: "/images/silver-focus-solar.jpg",
+      alt: "Rows of chrome solar panels under a black sky and a low sun",
+      title: "Solar energy",
+      body: "Solar generation and storage, where the environmental footprint is designed in from the start.",
+      tags: ["Solar", "Storage", "Efficiency"],
     },
     {
       key: "water",

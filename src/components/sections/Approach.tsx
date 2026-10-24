@@ -24,6 +24,10 @@ export default function Approach() {
           ))}
         </ul>
 
+        <p className="mandate" data-rise>
+          {approach.mandate}
+        </p>
+
         <div className="process" data-rise>
           <h3 className="process-heading">How an investment moves</h3>
           <div className="process-line" aria-hidden="true">

@@ -11,6 +11,7 @@ import ProgressRail from "./ProgressRail";
 import Journey from "./sections/Journey";
 import Impact from "./sections/Impact";
 import Approach from "./sections/Approach";
+import Portfolio from "./sections/Portfolio";
 import Focus from "./sections/Focus";
 import Contact from "./sections/Contact";
 
@@ -57,6 +58,7 @@ export default function Experience() {
         <Journey />
         <Impact />
         <Approach />
+        <Portfolio />
         <Focus />
         <Contact />
       </main>

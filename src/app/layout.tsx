@@ -19,7 +19,7 @@ const sans = Manrope({
 export const metadata: Metadata = {
   title: "Earth Fund: Capital for a living planet",
   description:
-    "Earth Fund is an environmental investment fund backing climate, forests, oceans and freshwater as one connected portfolio.",
+    "Earth Fund is an environmental investment fund. It backs solar, hemp and natural materials, and does not invest in fossil fuels or wind.",
   openGraph: {
     title: "Earth Fund",
     description: "Capital for a living planet",
